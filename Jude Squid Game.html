@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Squid Game Themed ICT Quiz</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      color: white;
+      text-align: center;
+    }
+    .quiz-container {
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #ff0080, #8000ff);
+      box-shadow: 0 0 20px rgba(255, 0, 128, 0.7);
+      border-radius: 15px;
+      color: white;
+      text-align: center;
+    }
+    .question {
+      margin-bottom: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      color: white;
+    }
+    button {
+      border: none;
+      cursor: pointer;
+      background-color: transparent;
+    }
+    img {
+      width: 150px;
+      margin: 10px;
+      border-radius: 10px;
+    }
+    .timer {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ff0000;
+    }
+    .result {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: #00ff00;
+    }
+    .intro-container {
+      margin-top: 50px;
+      color: white;
+    }
+    .play-again {
+      background: #ff0080;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      border: none;
+    }
+    .play-again:hover {
+      background: #8000ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="intro-container" id="intro">
+    <img src="file:///C:/Users/USER/Desktop/squd%20game/dall%201.gif" alt="Intro Image">
+    <p>Get ready! The quiz will begin shortly...</p>
+  </div>
+
+  <div class="quiz-container" id="quiz" style="display: none;">
+    <img id="top-image" src="file:///C:/Users/USER/Desktop/squd%20game/dall.gif" alt="Top Image">
+    <div class="timer" id="timer">10</div>
+    <div class="question" id="question">Question will appear here</div>
+    <button onclick="submitAnswer('yes')">
+      <img src="file:///C:/Users/USER/Desktop/squd%20game/yes.JPG" alt="Yes Button">
+    </button>
+    <button onclick="submitAnswer('no')">
+      <img src="file:///C:/Users/USER/Desktop/squd%20game/no.JPG" alt="No Button">
+    </button>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <div id="end-game" style="display:none;">
+    <img src="file:///C:/Users/USER/Desktop/squd%20game/shoot.gif" alt="Game Over">
+    <p class="result" id="final-score">Your final score is: </p>
+    <button class="play-again" onclick="restartQuiz()">Play Again</button>
+  </div>
+
+  <audio id="quiz-music" loop>
+    <source src="file:///C:/Users/USER/Desktop/squd%20game/videoplayback.m4a" type="audio/mp4">
+  </audio>
+
+  <script>
+    const questions = [
+      { question: "Is the CPU an example of hardware?", answer: "yes" },
+      { question: "Is Google Drive an example of cloud computing?", answer: "yes" },
+      { question: "Is a keyboard an output device?", answer: "no" },
+      { question: "Is firmware a type of software stored on hardware?", answer: "yes" },
+      { question: "Is an operating system an example of liveware?", answer: "no" },
+      { question: "Does a printer serve as an input device?", answer: "no" },
+      { question: "Is SaaS a type of cloud computing service?", answer: "yes" },
+      { question: "Is antivirus software considered hardware?", answer: "no" },
+      { question: "Is RAM a volatile memory device?", answer: "yes" },
+      { question: "Is the BIOS stored in ROM?", answer: "yes" }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timerInterval;
+    let timeLeft = 10;
+
+    const music = document.getElementById("quiz-music");
+
+    function startQuiz() {
+      document.getElementById("intro").style.display = "none";
+      document.getElementById("quiz").style.display = "block";
+      music.play();
+      loadQuestion();
+      startTimer();
+    }
+
+    function loadQuestion() {
+      if (currentQuestionIndex < questions.length) {
+        const questionElement = document.getElementById("question");
+        questionElement.textContent = questions[currentQuestionIndex].question;
+        document.getElementById("feedback").textContent = "";
+        resetTimer();
+      } else {
+        showFinalScore();
+      }
+    }
+
+    function submitAnswer(userAnswer) {
+      const correctAnswer = questions[currentQuestionIndex].answer;
+
+      if (userAnswer === correctAnswer) {
+        score++;
+        document.getElementById("feedback").innerHTML = "<img src='file:///C:/Users/USER/Desktop/squd%20game/dance.gif' alt='Correct'>";
+        setTimeout(() => {
+          currentQuestionIndex++;
+          loadQuestion();
+        }, 3000);
+      } else {
+        music.pause();
+        document.getElementById("quiz").style.display = "none";
+        document.getElementById("end-game").style.display = "block";
+        document.getElementById("final-score").textContent = `Your final score is ${score}/${questions.length}.`;
+      }
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        if (timeLeft > 0) {
+          timeLeft--;
+          document.getElementById("timer").textContent = timeLeft;
+        } else {
+          clearInterval(timerInterval);
+          submitAnswer("timeout");
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timeLeft = 10;
+      document.getElementById("timer").textContent = timeLeft;
+      startTimer();
+    }
+
+    function showFinalScore() {
+      music.pause();
+      document.getElementById("quiz").style.display = "none";
+      document.getElementById("end-game").style.display = "block";
+      document.getElementById("final-score").textContent = `Your final score is ${score}/${questions.length}.`;
+    }
+
+    function restartQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      document.getElementById("end-game").style.display = "none";
+      document.getElementById("quiz").style.display = "block";
+      music.play();
+      loadQuestion();
+      resetTimer();
+    }
+
+    setTimeout(startQuiz, 5000);
+  </script>
+</body>
+</html>
